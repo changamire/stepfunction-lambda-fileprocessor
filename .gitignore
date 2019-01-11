@@ -1,0 +1,3 @@
+.serverless
+.pytest-cache
+node_modules

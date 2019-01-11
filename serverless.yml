@@ -1,0 +1,47 @@
+service:
+  name: file-processor
+
+provider:
+  name: aws
+  iamManagedPolicies:
+    - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+plugins:
+  - serverless-step-functions
+  - serverless-pseudo-parameters
+
+functions:
+  file-processor:
+    name: lambda-file-processor
+    runtime: python3.6
+    memorySize: 512
+    timeout: 180
+    handler: fileprocessor.handler
+    description: "Processes a chunk of a file"
+    environment:
+      CHUNK_SIZE: 100000
+
+
+stepFunctions:
+  stateMachines:
+    processfile:
+      name: stepfunction-file-processor
+      definition:
+        Comment: "Orchestrates the processing of files of arbitary size"
+        StartAt: "Process Chunk"
+        States:
+          "Process Chunk":
+            Type: "Task"
+            Resource: "arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:lambda-file-processor"
+            Next: "Check Results"
+          "Check Results":
+            Type: "Choice"
+            Choices:
+              - Variable: "$.fileprocessor.results['finished']"
+                BooleanEquals: false 
+                Next: "Process Chunk"
+              - Variable: "$.fileprocessor.results['finished']"
+                BooleanEquals: true
+                Next: "Finish"
+          "Finish":
+            Type: "Succeed"

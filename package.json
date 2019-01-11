@@ -1,0 +1,7 @@
+{
+    "dependencies": {
+        "serverless-step-functions": "^1.8.0",
+        "serverless-pseudo-parameters": "^2.2.0"
+    }
+  }
+  
