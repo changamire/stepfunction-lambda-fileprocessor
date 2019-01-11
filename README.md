@@ -10,7 +10,6 @@ Then follow these steps,
 
 Clone the repository
 
-T
 ```
 https://github.com/changamire/stepfunction-lambda-fileprocessor.git
 ```
